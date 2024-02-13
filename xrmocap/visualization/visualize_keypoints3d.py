@@ -1,5 +1,7 @@
 # yapf: disable
 import numpy as np
+import subprocess
+from pathlib import Path
 from typing import List, Union
 from xrprimer.data_structure.camera import (
     FisheyeCameraParameter, PinholeCameraParameter,
@@ -132,4 +134,23 @@ def visualize_keypoints3d_projected(
         width=width,
         disable_tqdm=disable_tqdm,
         logger=logger)
+
+    # yapf: disable
+    out_path = Path(output_path)
+    ffmepg_command = [
+        'ffmpeg', '-an',
+        '-i', str(out_path),
+        '-vcodec', 'libx264',
+        '-pix_fmt', 'yuv420p',
+        out_path.parent / ('web' + out_path.name)
+    ]
+    # yapf: enable
+
+    # Convert video to a format that plays nicely on the browser
+    subprocess.run(
+        ffmepg_command,
+        stdin=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
     return ret_value
